@@ -1,0 +1,28 @@
+services:
+  db:
+    image: postgres:14
+    container_name: postgres_container
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: rgukt123
+      POSTGRES_DB: book_app_development
+    ports:
+      - "5432:5432"
+
+  web:
+    build: .
+    container_name: ruby_app_container
+    command: bash -c "bundle install && rails db:prepare && rails server -b 0.0.0.0"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      DATABASE_HOST: db
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: rgukt123
+
+volumes:
+  postgres_data:

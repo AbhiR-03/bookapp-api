@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ruby-app
+  namespace: bookapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ruby-app
+  template:
+    metadata:
+      labels:
+        app: ruby-app
+    spec:
+      initContainers:
+        - name: db-prepare
+          image: rabhi03/ruby-app:v1
+          command:
+            - sh
+            - -c
+            - |
+              gem install bundler:2.3.5 && \
+              until bundle _2.3.5_ install && rails db:prepare; do \
+                echo 'Waiting for DB or bundle setup...'; sleep 5; \
+              done
+          env:
+            - name: DATABASE_HOST
+              value: postgres
+            - name: DATABASE_USERNAME
+              value: postgres
+            - name: DATABASE_PASSWORD
+              value: rgukt123
+      containers:
+        - name: ruby-app
+          image: rabhi03/ruby-app:v1
+          ports:
+            - containerPort: 3000
+          env:
+            - name: DATABASE_HOST
+              value: postgres
+            - name: DATABASE_USERNAME
+              value: postgres
+            - name: DATABASE_PASSWORD
+              value: rgukt123
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ruby-app
+  namespace: bookapp
+spec:
+  selector:
+    app: ruby-app
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+

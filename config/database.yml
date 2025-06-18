@@ -1,0 +1,16 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  host: <%= ENV.fetch("DATABASE_HOST", "localhost") %>             
+  username: postgres   
+  password: rgukt123   
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+development:
+  <<: *default
+  database: book_app_development
+
+production:
+  <<: *default
+  database: book_app_production
+
