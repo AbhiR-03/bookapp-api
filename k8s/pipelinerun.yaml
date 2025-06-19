@@ -1,0 +1,27 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: ruby-app-run-v5
+  namespace: default
+spec:
+  pipelineRef:
+    name: bookapp-pipeline
+  params:
+    - name: GIT_REPO
+      value: https://github.com/AbhiR-03/bookapp-api.git
+    - name: IMAGE
+      value: docker.io/rabhi03/ruby-app:latest
+  workspaces:
+    - name: shared-workspace
+      volumeClaimTemplate:
+        metadata:
+          name: shared-pvc
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 1Gi
+    - name: dockerconfig
+      secret:
+        secretName: dockerhub-secret
+
